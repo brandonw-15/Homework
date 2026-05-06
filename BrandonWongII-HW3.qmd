@@ -105,6 +105,8 @@ of heart attacks that occur on different days of the week? Test using $\alpha = 
 
 `r bfcolor("ANSWERS TO QUESTION 1:", "red")` \
 
+$$H_0: p_{Sun}=p_{Mon}=p_{Tue}=p_{Wed}=p_{Thu}=p_{Fri}=p_{Sat}= 1/7$$
+$$H_a: \text{at least one } p_i \ne 1/7$$
 ```{r}
 n <- 200
 p <- 1/7
@@ -113,6 +115,7 @@ exp <- n*p
 obs <- c(24, 36, 27, 26, 32, 26, 29)
 
 diff <- obs - exp
+diff
 
 chisq <- sum(diff^2)/exp
 chisq
@@ -131,6 +134,7 @@ p_val
 ```
 
 **At a significance level $\alpha$ = 0.05, we do not have enough evidence to conclude that there is a difference in the percentages of heart attacks that occur on different days of the week.**
+
 
 
 
@@ -175,6 +179,49 @@ sufficient evidence to claim that the data do not fit the Poisson distribution? 
 
 
 ```{r}
+# Inputting Data
+counts <- c(rep(0, 56), rep(1, 104), rep(2, 80), rep(3, 62), 
+            rep(4, 42), rep(5, 27), rep(6, 9), rep(7, 9), rep(8, 5), 
+            rep(9, 3), rep(10, 2), rep(11, 0), rep(19, 1))
+
+freq <- table(counts)
+
+obs_freq <- c(freq["0"], freq["1"], freq["2"], freq["3"], freq["4"],
+         freq["5"], freq["6"], freq["7"], freq["8"], freq["9"],
+         freq["10"], 0, freq["19"])
+
+result <- data.frame(
+  Yi = c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "19"),
+  Frequency = as.numeric(obs_freq))
+
+result
+
+# Estimating Parameter (MLE of Poisson: lambda_hat = Y_bar)
+n <- sum(obs_freq)
+y <- as.numeric(result$Yi)
+
+lambda_MLE <- sum(y * result$Frequency) / n # lambda <- sum(counts) / length(counts); yields the same
+# lambda_MLE
+
+# Estimating Expected Probabilities under H0
+expected_prob <- dpois(y, lambda_MLE)
+# expected_prob
+
+# Expected Frequency (or counts)
+options(scipen = 999)
+expected_freq <- expected_prob * n
+# expected_freq
+
+# Difference between observed frequency an expected frequency
+freq_diff <- obs_freq - expected_freq
+# freq_diff
+
+# Pearson Chi-Sq Test
+chisq_2 <- sum((freq_diff^2) / expected_freq)
+chisq_2
+
+
+dpois(19, lambda_MLE)*400
 
 ```
 
@@ -218,9 +265,27 @@ income categories? Test at the $\alpha = 0.01$ level.
 :::
 `r bfcolor("ANSWERS TO QUESTION 3:", "red")` \
 
+**Q1:**
+
+Education Level: No College, Some College, Undergraduate Degree, Postgraduate Study
+Income Categories: Marginally Rich, Comfortably Rich, Super Rich
+
+**Q2:**
+
+$$H_0: \text{The proportion of the 3 education levels is the same across the 3 income categories (Homogenous)}$$
+$$H_a: \text{The proportion in the 3 education levels differ across the 3 income categories (Not Homogenous)}$$
 
 ```{r}
+data <- matrix(c(32, 20, 23,
+                 13, 16, 1,
+                 43, 51, 60,
+                 12, 13, 16),
+               nrow = 4, byrow = TRUE)
 
+colnames(data) <- c("Marginally_Rich", "Comfortably_Rich", "Super_Rich")
+rownames(data) <- c("No_College", "Some_College", "Undergraduate", "Postgraduate")
+
+data
 ```
 
 
