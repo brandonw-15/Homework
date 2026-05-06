@@ -1,0 +1,279 @@
+---
+title: 'Homework 3'
+subtitle: "PSTAT 120C: Design and Analysis of Experiments" 
+
+author: "Instructor: Ali Abuzaid"
+format: 
+ pdf:
+    code-fold: true
+    code-line-numbers: true
+    code-copy: true
+    code-tools: true
+    self-contained: true
+    toc: false
+    toc-location: left
+    number-sections: true
+    geometry: margin=0.7in 
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message =  FALSE)
+knitr::opts_chunk$set(warning =  FALSE)
+knitr::opts_chunk$set(error =  FALSE)
+bfcolor <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{\\textbf{%s}}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'><b>%s</b></span>", color, x)
+  } else x
+}
+```
+
+
+:::callout
+<div style="text-align: center">
+<span style="color: blue;"> **STUDENT NAME **</span>  
+</div>
+- Brandon Wong II (3621406)
+
+
+:::
+
+:::{.callout-tip}
+# Instructions
+
+* This homework aims to familiarize you with real-life data.
+
+* Please write your **full name** and **perm number** legibly on the front page of your homework sheet.
+
+* This homework must be completed and submitted **individually**. Collaboration is allowed for discussion, but each student must submit their own work.
+
+* Solve all homework problems. You may use `R` for your calculations and analysis, but you must include all `R` code used.  
+
+* Your reasoning must be clear and complete. To receive full credit, provide sufficient explanations alongside any code and results.
+
+* Ensure that all `R` code, mathematical formulas, and workings are presented clearly and appropriately.
+
+* All figures should be numbered, and axes must be labeled. 
+
+* Please use the provided `HW 3 S26.qmd` file to type your solutions and submit the completed assignment as a PDF file. You can utilize `RStudio` for this purpose. For guidance, refer to the [Tutorial: Hello, Quarto](https://quarto.org/docs/get-started/hello/rstudio.html)).
+
+* Submit your solution via **Gradescope** as **a single PDF file**.
+
+
+:::
+
+:::{.callout-caution}
+# Due Date
+**Due Date:** Friday, May 8, 2026 at 11:59 PM
+:::
+
+
+:::{.callout-caution}
+# Note to Students
+Solve all the questions both manually and using `R` commands, and ensure that your final answers from both methods are clearly presented and compared.
+:::
+
+
+
+\newpage
+
+`r bfcolor("ANSWER ALL THE FOLLOWING QUESTIONS:", "blue")` \
+
+:::{.callout-important}
+## Question 1  
+ Do you hate Mondays? Researchers in Germany have provided another reason for you: They
+concluded that the risk of heart attack on a Monday for a working person may be as much as
+50% greater than on any other day.1 The researchers kept track of heart attacks and coronary
+arrests over a period of 5 years among 330,000 people who lived near Augsberg, Germany. In an
+attempt to verify the researcher’s claim, 200 working people who had recently had heart attacks
+were surveyed. The day on which their heart attacks occurred appear in the following table.
+
+\centering
+\begin{tabular}{ccccccc}
+\hline
+Sunday & Monday & Tuesday & Wednesday & Thursday & Friday & Saturday \\
+24 & 36 & 27 & 26 & 32 & 26 & 29 \\
+\hline
+\end{tabular}
+Do these data present sufficient evidence to indicate that there is a difference in the percentages
+of heart attacks that occur on different days of the week? Test using $\alpha = 0.05$.
+
+- Obtain the p-value.
+
+:::
+
+
+`r bfcolor("ANSWERS TO QUESTION 1:", "red")` \
+
+```{r}
+n <- 200
+p <- 1/7
+
+exp <- n*p
+obs <- c(24, 36, 27, 26, 32, 26, 29)
+
+diff <- obs - exp
+
+chisq <- sum(diff^2)/exp
+chisq
+
+df <- length(obs) - 1
+
+# Critical Value
+crit_val <- qchisq(0.05, df, lower.tail = FALSE)
+crit_val
+
+crit_val > chisq # ==> Don't reject H0 if TRUE, Reject H0 if FALSE
+
+# Finding p-value
+p_val <- pchisq(chisq, df, lower.tail = FALSE)
+p_val
+```
+
+**At a significance level $\alpha$ = 0.05, we do not have enough evidence to conclude that there is a difference in the percentages of heart attacks that occur on different days of the week.**
+
+
+
+
+
+
+\newpage
+:::{.callout-important}
+## Question 2  
+The data in the following table are the frequency counts for 400 observations on the number
+of bacterial colonies within the field of a microscope, using samples of milk film.2 Is there
+sufficient evidence to claim that the data do not fit the Poisson distribution? (Use $\alpha = 0.05$.)
+	
+\textbf{Note:} For the `R` solution, you may use any appropriate built-in function where applicable, **and also** provide your own code to perform the calculations.
+
+\centering
+\begin{tabular}{cc}
+\hline
+\textbf{Number of Colonies per Field} & \textbf{Frequency of Observation} \\
+\hline
+0  & 56 \\
+1  & 104 \\
+2  & 80 \\
+3  & 62 \\
+4  & 42 \\
+5  & 27 \\
+6  & 9 \\
+7  & 9 \\
+8  & 5 \\
+9  & 3 \\
+10 & 2 \\
+11 & 0 \\
+19 & 1 \\
+\hline
+   & 400 \\
+\hline
+\end{tabular}
+
+:::
+
+`r bfcolor("ANSWERS TO QUESTION 2:", "red")` \
+
+
+```{r}
+
+```
+
+
+
+
+
+\newpage
+:::{.callout-important}
+## Question 3 
+ Does education really make a difference in how much money you will earn? Researchers randomly
+selected 100 people from each of three income categories—“marginally rich,” “comfortably
+rich,” and “super rich”—and recorded their education levels. The data is summarized
+in the table that follows.
+
+
+\centering
+\begin{tabular}{lccc}
+\hline
+\textbf{Highest Education Level} & \textbf{Marginally Rich} & \textbf{Comfortably Rich} & \textbf{Super Rich} \\
+\hline
+No college            & 32 & 20 & 23 \\
+Some college          & 13 & 16 & 1  \\
+Undergraduate degree  & 43 & 51 & 60 \\
+Postgraduate study    & 12 & 13 & 16 \\
+\hline
+Total & 100 & 100 & 100 \\
+\hline
+\end{tabular}
+
+
+\begin{enumerate}
+	\item Describe the independent multinomial populations whose proportions are compared in the
+$\chi^2$ analysis.
+
+\item Do the data indicate that the proportions in the various education levels differ for the three
+income categories? Test at the $\alpha = 0.01$ level.
+
+\end{enumerate}
+
+:::
+`r bfcolor("ANSWERS TO QUESTION 3:", "red")` \
+
+
+```{r}
+
+```
+
+
+
+
+
+\newpage
+
+:::{.callout-important}
+## Question 4 
+
+The results of a study suggest that the initial electrocardiogram (ECG) of a suspected heart
+attack victim can be used to predict in-hospital complications of an acute nature. The study
+included 469 patients with suspected myocardial infarction (heart attack). Each patient was
+categorized according to whether their initial ECG was positive or negative and whether the
+person suffered life-threatening complications subsequently in the hospital. The results are
+summarized in the following table.
+
+
+\centering
+\begin{tabular}{cccc}
+\hline
+ & \multicolumn{2}{c}{\textbf{Subsequent In-Hospital Life-Threatening Complications}} & \\
+\cline{2-3}
+\textbf{ECG} & \textbf{No} & \textbf{Yes} & \textbf{Total} \\
+\hline
+Negative & 166 & 1  & 167 \\
+Positive & 260 & 42 & 302 \\
+\hline
+Total & 426 & 43 & 469 \\
+\hline
+\end{tabular}
+
+
+Is there sufficient evidence to indicate that whether or not a heart attack patient suffers
+complications depends on the outcome of the initial ECG? Test using $\alpha = 0.05$.
+:::
+
+`r bfcolor("ANSWERS TO QUESTION 4:", "red")` \
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
