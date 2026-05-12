@@ -105,6 +105,8 @@ of heart attacks that occur on different days of the week? Test using $\alpha = 
 
 `r bfcolor("ANSWERS TO QUESTION 1:", "red")` \
 
+$$H_0: p_{Sun}=p_{Mon}=p_{Tue}=p_{Wed}=p_{Thu}=p_{Fri}=p_{Sat}= 1/7$$
+$$H_a: \text{at least one } p_i \ne 1/7$$
 ```{r}
 n <- 200
 p <- 1/7
@@ -113,6 +115,7 @@ exp <- n*p
 obs <- c(24, 36, 27, 26, 32, 26, 29)
 
 diff <- obs - exp
+diff
 
 chisq <- sum(diff^2)/exp
 chisq
@@ -132,8 +135,11 @@ p_val
 
 **At a significance level $\alpha$ = 0.05, we do not have enough evidence to conclude that there is a difference in the percentages of heart attacks that occur on different days of the week.**
 
+## Written Work
 
-
+```{r, out.width = "75%"}
+knitr::include_graphics('HW3Q1.jpeg')
+```
 
 
 
@@ -173,13 +179,66 @@ sufficient evidence to claim that the data do not fit the Poisson distribution? 
 
 `r bfcolor("ANSWERS TO QUESTION 2:", "red")` \
 
-
+$$H_0: \text{Data follows a Poisson Distribution}$$
+$$H_a: \text{Data DOES NOT follow a Poisson Distribtution}$$
 ```{r}
+# Inputting Data
+counts <- c(rep(0, 56), rep(1, 104), rep(2, 80), rep(3, 62), 
+            rep(4, 42), rep(5, 27), rep(6, 9), rep(7, 9), rep(8, 5), 
+            rep(9, 3), rep(10, 2), rep(19, 1))
 
+n <- length(counts)
+
+freq <- table(counts)
+
+obs_freq <- c(freq["0"], freq["1"], freq["2"], freq["3"], freq["4"],
+              freq["5"], freq["6"], sum(freq[as.numeric(names(freq)) >= 7]))
+
+result <- data.frame(
+  Yi = c("0", "1", "2", "3", "4", "5", "6", "7+"),
+  Frequency = as.numeric(obs_freq))
+
+result
+
+# Lambda MLE
+lambda_MLE <- sum(counts) / n
+
+# Estimating Frequencies Under H0 (using Lambda MLE) (Must be larger than 5)
+exp0 <- dpois(0, lambda_MLE) * n
+exp1 <- dpois(1, lambda_MLE) * n
+exp2 <- dpois(2, lambda_MLE) * n
+exp3 <- dpois(3, lambda_MLE) * n
+exp4 <- dpois(4, lambda_MLE) * n
+exp5 <- dpois(5, lambda_MLE) * n
+exp6 <- dpois(6, lambda_MLE) * n
+exp7plus <- n - (exp0 + exp1 + exp2 + exp3 + exp4 + exp5 + exp6)
+
+exp_freq <- c(exp0, exp1, exp2, exp3, exp4, exp5, exp6, exp7plus)
+exp_freq
+
+# Pearson ChiSq Test
+
+chisq2 <- sum((obs_freq - exp_freq)^2 / exp_freq)
+chisq2
+
+df2 <- length(obs_freq) - 1 - 1 # lost additional df for estimating paramater lambda)
+
+p_val2 <- pchisq(chisq2, df2, lower.tail = FALSE)
+p_val2
+
+# Critical Value
+
+crit_val2 <- qchisq(0.05, df2, lower.tail = FALSE)
+crit_val2 > chisq2 # TRUE ==> Fail to Reject H0, FALSE ==> Reject H0
+crit_val2
 ```
+**Since our p-value is basically 0, at the significance level $\alpha$ = 0.05, we will reject the null hypothesis, that is, we have sufficient evidence to claim that our data DOES NOT follow a Poisson Distribution.**
 
+## Written Work
 
-
+```{r, out.width = "75%"}
+knitr::include_graphics('HW3Q2.jpeg')
+```
 
 
 \newpage
@@ -218,11 +277,75 @@ income categories? Test at the $\alpha = 0.01$ level.
 :::
 `r bfcolor("ANSWERS TO QUESTION 3:", "red")` \
 
+**P1:**
+
+Independent Populations - The 3 distinct groups researchers chose to sample, in this case, the Income Categories: Marginally Rich, Comfortably Rich, Super Rich
+
+Multinomial Populations: The 4 mutually exclusive education levels people fall into within the 3 independent populations, the analysis will test whether there is a difference in the education level proportions across the 3 populations: No College, Some College, Undergraduate Degree, Postgraduate Study
+
+**P2:**
+
+$$H_0: \text{The proportion of the 4 education levels is the same across the 3 income categories (Homogenous)}$$
+$$H_a: \text{The proportion in the 3 education levels differ across the 3 income categories (Not Homogenous)}$$
 
 ```{r}
+data <- matrix(c(32, 20, 23,
+                 13, 16, 1,
+                 43, 51, 60,
+                 12, 13, 16),
+               nrow = 4, byrow = TRUE)
 
+colnames(data) <- c("Marginally_Rich", "Comfortably_Rich", "Super_Rich")
+rownames(data) <- c("No_College", "Some_College", "Undergraduate", "Postgraduate")
+
+data
+
+# Row Totals
+total_row1 <- sum(data[1,])
+total_row2 <- sum(data[2,])
+total_row3 <- sum(data[3,])
+total_row4 <- sum(data[4,])
+
+col_total <- 100 # since sampled 100 people from each income level
+
+grand_total <- 300
+
+# Expected Values
+
+exp_row1 <- (total_row1 * col_total) / grand_total
+exp_row2 <- (total_row2 * col_total) / grand_total
+exp_row3 <- (total_row3 * col_total) / grand_total
+exp_row4 <- (total_row4 * col_total) / grand_total
+
+# Test Statistic
+chisq3 <- sum((data[1,] - exp_row1)^2 / exp_row1) + sum((data[2,] - exp_row2)^2 / exp_row2) +
+  sum((data[3,] - exp_row3)^2 / exp_row3) + sum((data[4,] - exp_row4)^2 / exp_row4)
+chisq3
+
+df3 <- (nrow(data) - 1)*(ncol(data) - 1)
+
+# P-value and Critical Value
+
+p_val3 <- pchisq(chisq3, df3, lower.tail = FALSE)
+p_val3
+  
+crit_val3 <- qchisq(0.01, df3, lower.tail = FALSE)
+crit_val3 > chisq3 # TRUE ==> Fail to Reject H0, FALSE ==> Reject H0
+crit_val3
+```
+**At the significance level $\alpha$ = 0.01, our critical value is 16.81189 which is smaller than our observed test statistic of 19.172, which means we are within the rejection region and thus, will reject H0. That is, we have sufficient evidence to say that there is a difference in the education level proportions across the 3 income categories.** 
+
+## Written Work
+
+```{r, out.width = "75%"}
+knitr::include_graphics('HW3Q3.jpeg')
 ```
 
+
+### Verification
+```{r}
+chisq.test(data)
+```
 
 
 
@@ -261,10 +384,23 @@ complications depends on the outcome of the initial ECG? Test using $\alpha = 0.
 
 `r bfcolor("ANSWERS TO QUESTION 4:", "red")` \
 
+### Written Work
+
+```{r, out.width = "75%"}
+knitr::include_graphics('HW3Q4.jpeg')
+```
 
 
+### Using R functions
 ```{r}
+data2 <- matrix(c(166, 1,
+                 260, 42),
+               nrow = 2, byrow = TRUE)
 
+colnames(data2) <- c("No", "Yes")
+rownames(data2) <- c("Negative", "Positive")
+
+chisq.test(data2)
 ```
 
 
